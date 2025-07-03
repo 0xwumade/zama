@@ -103,7 +103,8 @@ async function checkUnlockTime() {
         document.getElementById("result").innerText = `🔓 Unlock Time: ${date.toLocaleString()}`;
     } catch (err) {
         console.error(err);
-        document.getElementById("result").innerText = `🚨 Error: ${err.message}`;
+        document.getElementById("result").innerText =  `🚨 This contract is not compatible or returned an error.`;
+
     }
 }
 </script>
