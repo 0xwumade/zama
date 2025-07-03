@@ -86,11 +86,13 @@ async function checkUnlockTime() {
     const provider = new ethers.JsonRpcProvider("https://sepolia.infura.io/v3/d5d20f07d4cc461ebc260316c2356639");
 
     // 🔍 Check if there's actually a contract deployed here
-    const code = await provider.getCode(contractAddress);
-    if (code === "0x") {
-        document.getElementById("result").innerText = `🚨 No contract deployed at this address.`;
-        return;
-    }
+    
+   const code = await provider.getCode(address);
+if (code === "0x") {
+  alert("This is not a smart contract address");
+  return;
+}
+
 
     const abi = [
         "function unlockTime() view returns (uint256)"
