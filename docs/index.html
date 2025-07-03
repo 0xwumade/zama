@@ -66,47 +66,46 @@
 </style>
 </head>
 <body>
-<div style="text-align:center; margin-top:50px;">
-  <h1 style="color:#fdd835;">🔐 Check Your Lock Contract</h1>
-  <input type="text" id="contractAddress" placeholder="Enter your Lock contract address" style="width:300px; padding:8px;" />
-  <button onclick="checkUnlockTime()" style="padding:8px 12px; background:#000; color:#fff; border:none; cursor:pointer;">Check Unlock Time</button>
-  <p id="result" style="margin-top:20px; font-size:18px;"></p>
-</div>
 
+<div class="container">
+  <h1>🔐 Check Your Lock Contract</h1>
+  <input type="text" id="contractAddress" placeholder="Enter your Lock contract address" />
+  <button onclick="checkUnlockTime()">Check Unlock Time</button>
+  <p id="result"></p>
+</div>
 
 <script>
 async function checkUnlockTime() {
     const contractAddress = document.getElementById("contractAddress").value.trim();
 
     if (!ethers.isAddress(contractAddress)) {
-        alert("Invalid address");
+        document.getElementById("result").innerText = "🚨 Invalid address.";
         return;
     }
 
-    const provider = new ethers.JsonRpcProvider("https://sepolia.infura.io/v3/d5d20f07d4cc461ebc260316c2356639");
-
-    // 🔍 Check if there's actually a contract deployed here
-    
-   const code = await provider.getCode(address);
-if (code === "0x") {
-  alert("This is not a smart contract address");
-  return;
-}
-
-
-    const abi = [
-        "function unlockTime() view returns (uint256)"
-    ];
-    const contract = new ethers.Contract(contractAddress, abi, provider);
+    const provider = new ethers.JsonRpcProvider(
+      "https://sepolia.infura.io/v3/d5d20f07d4cc461ebc260316c2356639"
+    );
 
     try {
+        const code = await provider.getCode(contractAddress);
+        if (code === "0x") {
+            document.getElementById("result").innerText =
+                "🚨 This is not a smart contract address.";
+            return;
+        }
+
+        const abi = [ "function unlockTime() view returns (uint256)" ];
+        const contract = new ethers.Contract(contractAddress, abi, provider);
+
         const unlockTime = await contract.unlockTime();
         const date = new Date(Number(unlockTime) * 1000);
-        document.getElementById("result").innerText = `🔓 Unlock Time: ${date.toLocaleString()}`;
+        document.getElementById("result").innerText =
+            `🔓 Unlock Time: ${date.toLocaleString()}`;
     } catch (err) {
         console.error(err);
-        document.getElementById("result").innerText =  `🚨 ❌ This contract does not support unlockTime(). Please enter a compatible contract address.`;
-
+        document.getElementById("result").innerText =
+            "🚨 ❌ This contract does not support unlockTime(). Please enter a compatible contract address.";
     }
 }
 </script>
