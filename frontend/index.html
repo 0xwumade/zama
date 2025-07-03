@@ -66,42 +66,38 @@
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>🔐 Zama Lock Checker</h1>
-  <input type="text" id="contractAddress" placeholder="Enter your contract address" />
-  <button id="check">Check unlockTime</button>
-  <div id="result"></div>
+<div style="text-align:center; margin-top:50px;">
+  <h1 style="color:#fdd835;">🔐 Check Your Lock Contract</h1>
+  <input type="text" id="contractAddress" placeholder="Enter your Lock contract address" style="width:300px; padding:8px;" />
+  <button onclick="checkUnlockTime()" style="padding:8px 12px; background:#000; color:#fff; border:none; cursor:pointer;">Check Unlock Time</button>
+  <p id="result" style="margin-top:20px; font-size:18px;"></p>
 </div>
 
+
 <script>
-const abi = [
-  "function unlockTime() view returns (uint256)"
-];
+async function checkUnlockTime() {
+    const contractAddress = document.getElementById("contractAddress").value.trim();
 
-document.getElementById("check").onclick = async () => {
-  const result = document.getElementById("result");
-  const address = document.getElementById("contractAddress").value.trim();
+    if (!ethers.isAddress(contractAddress)) {
+        alert("Invalid address");
+        return;
+    }
 
-  if (!address) {
-    result.textContent = "🚨 Please enter a contract address.";
-    return;
-  }
-
-  try {
-    result.textContent = "⏳ Fetching unlockTime…";
     const provider = new ethers.JsonRpcProvider("https://sepolia.infura.io/v3/d5d20f07d4cc461ebc260316c2356639");
+    const abi = [
+        "function unlockTime() view returns (uint256)"
+    ];
+    const contract = new ethers.Contract(contractAddress, abi, provider);
 
-    const contract = new ethers.Contract(address, abi, provider);
-
-    const unlockTime = await contract.unlockTime();
-    const date = new Date(Number(unlockTime) * 1000);
-
-    result.textContent = `🔓 Unlock Time: ${date.toUTCString()}`;
-  } catch (err) {
-    console.error(err);
-    result.textContent = `🚨 Error: ${err.message}`;
-  }
-};
+    try {
+        const unlockTime = await contract.unlockTime();
+        const date = new Date(Number(unlockTime) * 1000);
+        document.getElementById("result").innerText = `🔓 Unlock Time: ${date.toLocaleString()}`;
+    } catch (err) {
+        document.getElementById("result").innerText = `🚨 Error: ${err.message}`;
+    }
+}
 </script>
+
 </body>
 </html>
